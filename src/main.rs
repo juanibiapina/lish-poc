@@ -1,5 +1,7 @@
 extern crate lish;
 
+use lish::repl;
+
 fn main() {
-    lish::repl();
+    repl::run();
 }
