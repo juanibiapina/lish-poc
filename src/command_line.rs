@@ -23,9 +23,15 @@ impl CommandLine {
     }
 
     pub fn run(&self) {
-        let mut child = Command::new(&self.command)
+        let mut child = match Command::new(&self.command)
             .args(&self.args)
-            .spawn().unwrap();
+            .spawn() {
+                Ok(child) => child,
+                Err(e) => {
+                    println!("lish: command not found: {}", &self.command);
+                    return;
+                },
+            };
 
         child.wait().unwrap();
     }
