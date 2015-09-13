@@ -29,7 +29,7 @@ impl CommandLine {
             .args(&self.args)
             .spawn() {
                 Ok(child) => child,
-                Err(e) => return Err(Error::CommandNotFound(self.command.to_string())),
+                Err(_) => return Err(Error::CommandNotFound(self.command.to_string())),
             };
 
         child.wait().unwrap();

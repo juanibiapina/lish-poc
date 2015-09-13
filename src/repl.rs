@@ -12,7 +12,7 @@ fn process(input: String) -> Result<(), Error> {
 }
 
 fn rep() -> Result<(), Error> {
-    let input = match readline::readline(":) ") {
+    let input = match readline::lish_readline(":) ") {
         Some(input) => input,
         None => return Err(Error::EndOfInput),
     };
