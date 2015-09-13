@@ -23,11 +23,11 @@ impl CommandLine {
     }
 
     pub fn run(&self) {
-        let output = Command::new(&self.command)
+        let mut child = Command::new(&self.command)
             .args(&self.args)
-            .output().unwrap();
+            .spawn().unwrap();
 
-        println!("{}", String::from_utf8(output.stdout).unwrap().trim());
+        child.wait().unwrap();
     }
 }
 
