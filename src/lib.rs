@@ -1,3 +1,4 @@
+mod error;
 mod readline;
 mod command_line;
 

@@ -1,5 +1,7 @@
 use std::process::Command;
 
+use error::Error;
+
 pub struct CommandLine {
     command: String,
     args: Vec<String>,
@@ -22,18 +24,17 @@ impl CommandLine {
         }
     }
 
-    pub fn run(&self) {
+    pub fn run(&self) -> Result<(), Error> {
         let mut child = match Command::new(&self.command)
             .args(&self.args)
             .spawn() {
                 Ok(child) => child,
-                Err(e) => {
-                    println!("lish: command not found: {}", &self.command);
-                    return;
-                },
+                Err(e) => return Err(Error::CommandNotFound(self.command.to_string())),
             };
 
         child.wait().unwrap();
+
+        Ok(())
     }
 }
 
