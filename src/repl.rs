@@ -18,10 +18,12 @@ pub fn run() {
             },
         };
 
-        if input.len() == 0 {
+        let trimmed_input = input.trim();
+
+        if trimmed_input.len() == 0 {
             continue
         }
 
-        process(input);
+        process(trimmed_input.to_string());
     }
 }
