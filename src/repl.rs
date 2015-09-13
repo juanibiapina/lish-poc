@@ -46,6 +46,10 @@ pub fn run() {
             },
         };
 
+        if input.len() == 0 {
+            continue
+        }
+
         let result = rep(input);
 
         println!("{}", result);
