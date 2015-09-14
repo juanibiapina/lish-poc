@@ -44,3 +44,11 @@
 
 ~@(1 2 3)
 ;=>(splice-unquote (1 2 3))
+
+;;; Testing reader errors
+(1 2
+; expected ')', got EOF
+[1 2
+; expected ']', got EOF
+"abc
+; expected '"', got EOF
