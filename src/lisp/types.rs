@@ -11,6 +11,7 @@ pub enum LispType {
     String(String),
     Int(isize),
     List(Vec<LispValue>),
+    Vector(Vec<LispValue>),
 }
 
 pub type LispValue = Rc<LispType>;
@@ -37,6 +38,9 @@ impl LispType {
             LispType::List(ref v) => {
                 pr_list(v, print_readably, "(", ")", " ")
             },
+            LispType::Vector(ref v) => {
+                pr_list(v, print_readably, "[", "]", " ")
+            },
         }
     }
 }
@@ -60,6 +64,10 @@ fn pr_list(lst: &Vec<LispValue>, pr: bool, start: &str , end: &str, join: &str) 
 // Constructors
 pub fn list(seq: Vec<LispValue>) -> LispValue {
     Rc::new(LispType::List(seq))
+}
+
+pub fn vector(seq: Vec<LispValue>) -> LispValue {
+    Rc::new(LispType::Vector(seq))
 }
 
 pub fn _int(i: isize) -> LispValue {

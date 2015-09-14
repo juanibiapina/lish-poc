@@ -27,8 +27,42 @@ impl Reader {
         let token = &string_token[..];
 
         match token {
+            "'" => {
+                let _ = self.next();
+                match self.read_form() {
+                    Ok(f) => Ok(types::list(vec![types::symbol("quote"), f])),
+                    Err(e) => Err(e),
+                }
+            },
+            "`" => {
+                let _ = self.next();
+                match self.read_form() {
+                    Ok(f) => Ok(types::list(vec![types::symbol("quasiquote"), f])),
+                    Err(e) => Err(e),
+                }
+            },
+            "~" => {
+                let _ = self.next();
+                match self.read_form() {
+                    Ok(f) => Ok(types::list(vec![types::symbol("unquote"), f])),
+                    Err(e) => Err(e),
+                }
+            },
+            "~@" => {
+                let _ = self.next();
+                match self.read_form() {
+                    Ok(f) => Ok(types::list(vec![types::symbol("splice-unquote"), f])),
+                    Err(e) => Err(e),
+                }
+            },
+
+            ")" => Err(Error::Parser("unexpected ')'".to_string())),
             "(" => self.read_list(),
-            _ => self.read_atom(),
+
+            "]" => Err(Error::Parser("unexpected ']'".to_string())),
+            "[" => self.read_vector(),
+
+            _   => self.read_atom()
         }
     }
 
@@ -36,6 +70,12 @@ impl Reader {
         let seq = try!(self.read_seq("(", ")"));
 
         Ok(types::list(seq))
+    }
+
+    fn read_vector(&mut self) -> types::LispResult {
+        let seq = try!(self.read_seq("[", "]"));
+
+        Ok(types::vector(seq))
     }
 
     fn read_atom(&mut self) -> types::LispResult {

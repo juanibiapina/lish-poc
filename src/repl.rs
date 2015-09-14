@@ -27,7 +27,7 @@ fn process(input: String) -> Result<(), Error> {
         return Err(Error::Comment);
     }
 
-    if input.starts_with("(") {
+    if input.starts_with("(") || input.starts_with("'") || input.starts_with("`") || input.starts_with("~") {
         process_lisp(input)
     } else {
         process_shell(input)
