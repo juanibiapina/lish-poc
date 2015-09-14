@@ -1,3 +1,23 @@
-;;; Command with full path
+;;; Shell Command with full path
 /bin/echo output
 ;=>output
+
+;;; Testing read of lists
+
+(+ 1 2)
+;=>(+ 1 2)
+
+((3 4))
+;=>((3 4))
+
+(+ 1 (+ 2 3))
+;=>(+ 1 (+ 2 3))
+
+  ( +   1   (+   2 3   )   )
+;=>(+ 1 (+ 2 3))
+
+(* 1 2)
+;=>(* 1 2)
+
+(** 1 2)
+;=>(** 1 2)
