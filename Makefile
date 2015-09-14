@@ -11,4 +11,4 @@ test_unit:
 
 .PHONY: test
 test: build_debug test_unit
-	scripts/test-runner tests/repl.lish
+	scripts/test-runner tests/integration.lish
