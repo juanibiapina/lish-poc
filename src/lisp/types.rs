@@ -18,7 +18,7 @@ pub type LispValue = Rc<LispType>;
 pub type LispResult = Result<LispValue, Error>;
 
 impl LispType {
-    pub fn print(&self) -> String {
+    pub fn print(&self, print_readably: bool) -> String {
         match *self {
             LispType::Nil => "nil".to_string(),
             LispType::True => "true".to_string(),
@@ -28,18 +28,20 @@ impl LispType {
             LispType::String(ref v) => {
                 if v.starts_with("\u{29e}") {
                     format!(":{}", &v[2..])
-                } else {
+                } else if print_readably {
                     printer::escape_str(v)
+                } else {
+                    v.clone()
                 }
             },
             LispType::List(ref v) => {
-                pr_list(v, "(", ")", " ")
+                pr_list(v, print_readably, "(", ")", " ")
             },
         }
     }
 }
 
-fn pr_list(lst: &Vec<LispValue>, start: &str , end: &str, join: &str) -> String {
+pub fn pr_list(lst: &Vec<LispValue>, pr: bool, start: &str , end: &str, join: &str) -> String {
     let mut first = true;
     let mut res = String::new();
     res.push_str(start);
@@ -49,7 +51,7 @@ fn pr_list(lst: &Vec<LispValue>, start: &str , end: &str, join: &str) -> String 
         } else {
             res.push_str(join);
         }
-        res.push_str(&mv.print());
+        res.push_str(&mv.print(pr));
     }
     res.push_str(end);
     res

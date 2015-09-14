@@ -9,7 +9,7 @@ fn process_lisp(input: String) -> Result<(), Error> {
 
     let result = try!(reader.read_form());
 
-    println!("{}", result.print());
+    println!("{}", result.print(true));
 
     Ok(())
 }
