@@ -41,7 +41,7 @@ impl LispType {
     }
 }
 
-pub fn pr_list(lst: &Vec<LispValue>, pr: bool, start: &str , end: &str, join: &str) -> String {
+fn pr_list(lst: &Vec<LispValue>, pr: bool, start: &str , end: &str, join: &str) -> String {
     let mut first = true;
     let mut res = String::new();
     res.push_str(start);
