@@ -23,6 +23,10 @@ fn process_shell(input: String) -> Result<(), Error> {
 }
 
 fn process(input: String) -> Result<(), Error> {
+    if input.starts_with("#") {
+        return Err(Error::Comment);
+    }
+
     if input.starts_with("(") {
         process_lisp(input)
     } else {
@@ -51,6 +55,9 @@ pub fn run() {
     loop {
         match rep() {
             Ok(()) => {},
+            Err(Error::Comment) => {
+                continue;
+            },
             Err(Error::EndOfInput) => {
                 println!("");
                 break;
