@@ -1,2 +1,3 @@
+;;; Command with full path
 /bin/echo output
 ;=>output
