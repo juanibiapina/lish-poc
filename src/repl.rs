@@ -1,7 +1,7 @@
 use readline;
 
 use error::Error;
-use command_line::CommandLine;
+use shell::command_line::CommandLine;
 
 fn process(input: String) -> Result<(), Error> {
     let command_line = CommandLine::parse(input);

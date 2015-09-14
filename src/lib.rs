@@ -1,5 +1,5 @@
 mod error;
 mod readline;
-mod command_line;
+mod shell;
 
 pub mod repl;
