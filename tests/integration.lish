@@ -2,48 +2,21 @@
 /bin/echo output
 ;=>output
 
-;;; Testing read of lists
-
+;;; Testing evaluation of arithmetic operations
 (+ 1 2)
-;=>(+ 1 2)
+;=>3
 
-((3 4))
-;=>((3 4))
+(+ 5 (* 2 3))
+;=>11
 
-(+ 1 (+ 2 3))
-;=>(+ 1 (+ 2 3))
+(- (+ 5 (* 2 3)) 3)
+;=>8
 
-  ( +   1   (+   2 3   )   )
-;=>(+ 1 (+ 2 3))
+(/ (- (+ 5 (* 2 3)) 3) 4)
+;=>2
 
-(* 1 2)
-;=>(* 1 2)
-
-(** 1 2)
-;=>(** 1 2)
-
-;;; Testing read of quoting
-
-'1
-;=>(quote 1)
-
-'(1 2 3)
-;=>(quote (1 2 3))
-
-`1
-;=>(quasiquote 1)
-
-`(1 2 3)
-;=>(quasiquote (1 2 3))
-
-~1
-;=>(unquote 1)
-
-~(1 2 3)
-;=>(unquote (1 2 3))
-
-~@(1 2 3)
-;=>(splice-unquote (1 2 3))
+(/ (- (+ 515 (* 222 311)) 302) 27)
+;=>2565
 
 ;;; Testing reader errors
 (1 2

@@ -1,14 +1,46 @@
-use readline;
+use std::collections::HashMap;
 
+use readline;
 use error::Error;
 use shell::command_line::CommandLine;
 use lisp;
+use lisp::types;
+use lisp::eval;
+
+fn int_op<F>(f: F, a:Vec<types::LispValue>) -> types::LispResult
+    where F: FnOnce(isize, isize) -> isize
+{
+    match *a[0] {
+        types::LispType::Int(a0) => match *a[1] {
+            types::LispType::Int(a1) => Ok(types::_int(f(a0,a1))),
+            _ => Err(Error::TypeError("second arg must be an int".to_string())),
+        },
+        _ => Err(Error::TypeError("first arg must be an int".to_string())),
+    }
+}
+
+fn add(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i+j }, a) }
+fn sub(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i-j }, a) }
+fn mul(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i*j }, a) }
+fn div(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i/j }, a) }
 
 fn process_lisp(input: String) -> Result<(), Error> {
     let mut reader = lisp::reader::Reader::new(input);
 
-    let result = try!(reader.read_form());
+    // read
+    let ast = try!(reader.read_form());
 
+    // repl env
+    let mut repl_env : HashMap<String, types::LispValue> = HashMap::new();
+    repl_env.insert("+".to_string(), types::function(add));
+    repl_env.insert("-".to_string(), types::function(sub));
+    repl_env.insert("*".to_string(), types::function(mul));
+    repl_env.insert("/".to_string(), types::function(div));
+
+    // eval
+    let result = try!(eval::eval(ast, &repl_env));
+
+    // print
     println!("{}", result.print(true));
 
     Ok(())
@@ -69,6 +101,15 @@ pub fn run() {
                 println!("lish: command not found: {}", command);
             },
             Err(Error::Parser(message)) => {
+                println!("{}", message);
+            },
+            Err(Error::BindingNotFound(name)) => {
+                println!("{} not found", name);
+            },
+            Err(Error::ApplyInNonFunction) => {
+                println!("trying to apply a non function");
+            },
+            Err(Error::TypeError(message)) => {
                 println!("{}", message);
             },
         };

@@ -12,6 +12,7 @@ pub enum LispType {
     Int(isize),
     List(Vec<LispValue>),
     Vector(Vec<LispValue>),
+    Function(fn(Vec<LispValue>) -> LispResult),
 }
 
 pub type LispValue = Rc<LispType>;
@@ -19,6 +20,14 @@ pub type LispValue = Rc<LispType>;
 pub type LispResult = Result<LispValue, Error>;
 
 impl LispType {
+    pub fn apply(&self, args:Vec<LispValue>) -> LispResult {
+        match *self {
+            LispType::Function(f) => f(args),
+            _ => Err(Error::ApplyInNonFunction),
+        }
+
+    }
+
     pub fn print(&self, print_readably: bool) -> String {
         match *self {
             LispType::Nil => "nil".to_string(),
@@ -40,6 +49,9 @@ impl LispType {
             },
             LispType::Vector(ref v) => {
                 pr_list(v, print_readably, "[", "]", " ")
+            },
+            LispType::Function(_) => {
+                format!("#<function ...>")
             },
         }
     }
@@ -92,4 +104,8 @@ pub fn symbol(strn: &str) -> LispValue {
 
 pub fn string(strn: String) -> LispValue {
     Rc::new(LispType::String(strn))
+}
+
+pub fn function(f: fn(Vec<LispValue>) -> LispResult) -> LispValue {
+    Rc::new(LispType::Function(f))
 }

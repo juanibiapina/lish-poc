@@ -4,4 +4,7 @@ pub enum Error {
     EmptyCommand,
     CommandNotFound(String),
     Parser(String),
+    BindingNotFound(String),
+    ApplyInNonFunction,
+    TypeError(String),
 }
