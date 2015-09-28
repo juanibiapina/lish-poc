@@ -3,6 +3,7 @@ extern crate libc;
 
 use std::ffi::{CStr, CString};
 use std::str;
+use std;
 
 mod ext_readline {
     extern crate libc;
@@ -38,9 +39,23 @@ pub fn readline(prompt: &str) -> Option<String> {
 // --------------------------------------------
 
 pub fn lish_readline (prompt: &str) -> Option<String> {
-    let line = readline(prompt);
+    let istty = unsafe { libc::isatty(libc::STDIN_FILENO as i32) } != 0;
+
+    let line: Option<String>;
+
+    if istty {
+        line = readline(prompt);
+    } else {
+        let mut buffer = String::new();
+        line = match std::io::stdin().read_line(&mut buffer) {
+            Ok(_) => Some(buffer),
+            Err(_) => None,
+        };
+    }
+
     if let Some(ref s) = line {
         add_history(s);
     }
+
     line
 }
