@@ -1,11 +1,10 @@
-use std::collections::HashMap;
-
 use readline;
 use error::Error;
 use shell::command_line::CommandLine;
 use lisp;
 use lisp::types;
 use lisp::eval;
+use lisp::env;
 
 fn int_op<F>(f: F, a:Vec<types::LispValue>) -> types::LispResult
     where F: FnOnce(isize, isize) -> isize
@@ -31,14 +30,14 @@ fn process_lisp(input: String) -> Result<(), Error> {
     let ast = try!(reader.read_form());
 
     // repl env
-    let mut repl_env : HashMap<String, types::LispValue> = HashMap::new();
-    repl_env.insert("+".to_string(), types::function(add));
-    repl_env.insert("-".to_string(), types::function(sub));
-    repl_env.insert("*".to_string(), types::function(mul));
-    repl_env.insert("/".to_string(), types::function(div));
+    let repl_env = env::env_new(None);
+    env::env_set(&repl_env, types::symbol("+"), types::function(add));
+    env::env_set(&repl_env, types::symbol("-"), types::function(sub));
+    env::env_set(&repl_env, types::symbol("*"), types::function(mul));
+    env::env_set(&repl_env, types::symbol("/"), types::function(div));
 
     // eval
-    let result = try!(eval::eval(ast, &repl_env));
+    let result = try!(eval::eval(ast, repl_env.clone()));
 
     // print
     println!("{}", result.print(true));
