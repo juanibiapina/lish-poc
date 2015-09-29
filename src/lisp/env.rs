@@ -86,7 +86,7 @@ pub fn env_root(env: &Env) -> Env {
 pub fn env_set(env: &Env, key: LispValue, val: LispValue) {
     match *key {
         Symbol(ref k) => { env.borrow_mut().data.insert(k.to_string(), val); }
-        _ => {},
+        _ => panic!("unreachable code"),
     }
 }
 
