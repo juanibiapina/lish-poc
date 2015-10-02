@@ -60,7 +60,6 @@ fn rep(env: Env) -> Result<(), Error> {
 }
 
 pub fn run() {
-    // repl env
     let repl_env = env_new(None);
     for (k, v) in core::ns().into_iter() {
         env_set(&repl_env, types::symbol(&k), v);
