@@ -24,7 +24,7 @@ pub fn eval(ast: types::LispValue, env: Env) -> types::LispResult {
     };
 }
 
-pub fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
+fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
     let (form_type, elements) = match *ast {
         types::LispType::List(ref elements) => {
             let ref head = *elements[0];
@@ -37,50 +37,9 @@ pub fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
     };
 
     match form_type {
-        FormType::Def => {
-            let a1 = (*elements)[1].clone();
-            let a2 = (*elements)[2].clone();
-            let r = try!(eval(a2, env.clone()));
-            match *a1 {
-                types::LispType::Symbol(_) => {
-                    env_set(&env.clone(), a1, r.clone());
-                    return Ok(types::_nil());
-                },
-                _ => panic!("def! of non-symbol"),
-            }
-        },
-        FormType::Let => {
-            let let_env = env_new(Some(env.clone()));
-            let a1 = (*elements)[1].clone();
-            let a2 = (*elements)[2].clone();
-            match *a1 {
-                types::LispType::List(ref binds) | types::LispType::Vector(ref binds) => {
-                    let mut it = binds.iter();
-                    while it.len() >= 2 {
-                        let b = it.next().unwrap();
-                        let exp = it.next().unwrap();
-                        match **b {
-                            types::LispType::Symbol(_) => {
-                                let r = try!(eval(exp.clone(), let_env.clone()));
-                                env_set(&let_env, b.clone(), r);
-                            },
-                            _ => panic!("let* with non-symbol binding"),
-                        }
-                    }
-                },
-                _ => panic!("let* with non-list bindings"),
-            }
-            return eval(a2, let_env.clone());
-        },
-        FormType::Function => {
-            let el = try!(eval_ast(ast.clone(), env.clone()));
-            let args = match *el {
-                types::LispType::List(ref args) => args,
-                _ => panic!("unreachable code"),
-            };
-            let ref f = args.clone()[0];
-            f.apply(args[1..].to_vec())
-        },
+        FormType::Def => eval_def(elements, env),
+        FormType::Let => eval_let(elements, env),
+        FormType::Function => eval_function(ast.clone(), env),
     }
 }
 
@@ -98,4 +57,51 @@ fn eval_ast(ast: types::LispValue, env: Env) -> types::LispResult {
         },
         _ => Ok(ast.clone()),
     }
+}
+
+fn eval_def(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+    let a1 = (*elements)[1].clone();
+    let a2 = (*elements)[2].clone();
+    let r = try!(eval(a2, env.clone()));
+    match *a1 {
+        types::LispType::Symbol(_) => {
+            env_set(&env.clone(), a1, r.clone());
+            return Ok(types::_nil());
+        },
+        _ => panic!("def! of non-symbol"),
+    }
+}
+
+fn eval_let(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+    let let_env = env_new(Some(env.clone()));
+    let a1 = (*elements)[1].clone();
+    let a2 = (*elements)[2].clone();
+    match *a1 {
+        types::LispType::List(ref binds) | types::LispType::Vector(ref binds) => {
+            let mut it = binds.iter();
+            while it.len() >= 2 {
+                let b = it.next().unwrap();
+                let exp = it.next().unwrap();
+                match **b {
+                    types::LispType::Symbol(_) => {
+                        let r = try!(eval(exp.clone(), let_env.clone()));
+                        env_set(&let_env, b.clone(), r);
+                    },
+                    _ => panic!("let* with non-symbol binding"),
+                }
+            }
+        },
+        _ => panic!("let* with non-list bindings"),
+    }
+    return eval(a2, let_env.clone());
+}
+
+fn eval_function(ast: types::LispValue, env: Env) -> types::LispResult {
+    let el = try!(eval_ast(ast.clone(), env.clone()));
+    let args = match *el {
+        types::LispType::List(ref args) => args,
+        _ => panic!("unreachable code"),
+    };
+    let ref f = args.clone()[0];
+    f.apply(args[1..].to_vec())
 }
