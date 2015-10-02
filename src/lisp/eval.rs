@@ -4,6 +4,7 @@ use lisp::env::{Env, env_new, env_get, env_set};
 enum FormType {
     Def,
     Let,
+    Do,
     Function,
 }
 
@@ -12,6 +13,7 @@ impl FormType {
         match name {
             "def!" => FormType::Def,
             "let" => FormType::Let,
+            "do" => FormType::Do,
             _ => FormType::Function,
         }
     }
@@ -39,6 +41,7 @@ fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
     match form_type {
         FormType::Def => eval_def(elements, env),
         FormType::Let => eval_let(elements, env),
+        FormType::Do => eval_do(elements, env),
         FormType::Function => eval_function(ast.clone(), env),
     }
 }
@@ -94,6 +97,17 @@ fn eval_let(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
         _ => panic!("let* with non-list bindings"),
     }
     return eval(a2, let_env.clone());
+}
+
+fn eval_do(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+    let el = types::list(elements[1..].to_vec());
+    match *try!(eval_ast(el, env.clone())) {
+        types::LispType::List(ref lst) => {
+            let ref last = lst[lst.len()-1];
+            return Ok(last.clone());
+        }
+        _ => panic!("invalid do call"),
+    }
 }
 
 fn eval_function(ast: types::LispValue, env: Env) -> types::LispResult {
