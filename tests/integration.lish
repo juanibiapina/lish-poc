@@ -9,33 +9,62 @@ echo lol
 ;;; Testing evaluation of arithmetic operations
 (+ 1 2)
 ;=>3
-
 (+ 5 (* 2 3))
 ;=>11
-
 (- (+ 5 (* 2 3)) 3)
 ;=>8
-
 (/ (- (+ 5 (* 2 3)) 3) 4)
 ;=>2
-
 (/ (- (+ 515 (* 222 311)) 302) 27)
 ;=>2565
 
-;;; def!
-(def! a 1)
+;;; Testing def!
+(def! x 3)
 ;=>nil
-
-(+ a 1)
-;=>2
-
-(def! a (+ a 1))
+(+ x 1)
+;=>4
+(def! x 4)
 ;=>nil
+(+ x 1)
+;=>5
+(def! y (+ 1 7))
+;=>nil
+(+ y 1)
+;=>9
 
-(+ a 1)
-;=>3
+;;; let*
+(let* (z 9) z)
+;=>9
+(let* (x 9) x)
+;=>9
+(+ x 1)
+;=>5
+(let* (z (+ 2 3)) (+ 1 z))
+;=>6
+(let* (p (+ 2 3) q (+ 2 p)) (+ p q))
+;=>12
+
+;;; outer environment
+(def! a 4)
+;=>nil
+(let* (q 9) q)
+;=>9
+(let* (q 9) a)
+;=>4
+(let* (z 2) (let* (q 9) a))
+;=>4
+
+;;; let* with vector bindings
+(let* [z 9] z)
+;=>9
+(let* [p (+ 2 3) q (+ 2 p)] (+ p q))
+;=>12
+
+;;; vector evaluation
+(let* (a 5 b 6) [3 4 a [b 7] 8])
+;=>[3 4 5 [6 7] 8]
 
 
-;;; Testing reader errors
+;;; reader errors
 (1 2
 ;=>expected ')', got EOF

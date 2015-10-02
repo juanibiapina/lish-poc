@@ -1,5 +1,5 @@
 use lisp::types;
-use lisp::env::{Env, env_get, env_set};
+use lisp::env::{Env, env_new, env_get, env_set};
 
 pub fn eval(ast: types::LispValue, env: Env) -> types::LispResult {
     match *ast {
@@ -30,6 +30,29 @@ pub fn eval(ast: types::LispValue, env: Env) -> types::LispResult {
                 },
                 _ => panic!("def! of non-symbol"),
             }
+        },
+        "let*" => {
+            let let_env = env_new(Some(env.clone()));
+            let a1 = (*elements)[1].clone();
+            let a2 = (*elements)[2].clone();
+            match *a1 {
+                types::LispType::List(ref binds) | types::LispType::Vector(ref binds) => {
+                    let mut it = binds.iter();
+                    while it.len() >= 2 {
+                        let b = it.next().unwrap();
+                        let exp = it.next().unwrap();
+                        match **b {
+                            types::LispType::Symbol(_) => {
+                                let r = try!(eval(exp.clone(), let_env.clone()));
+                                env_set(&let_env, b.clone(), r);
+                            },
+                            _ => panic!("let* with non-symbol binding"),
+                        }
+                    }
+                },
+                _ => panic!("let* with non-list bindings"),
+            }
+            return eval(a2, let_env.clone());
         },
         _ => {
             let el = try!(eval_ast(ast.clone(), env.clone()));
