@@ -47,24 +47,24 @@ pub fn lte(a: Vec<LispValue>) -> LispResult { bool_op(|i,j| { i<=j }, a) }
 pub fn gt (a: Vec<LispValue>) -> LispResult { bool_op(|i,j| { i>j }, a) }
 pub fn gte(a: Vec<LispValue>) -> LispResult { bool_op(|i,j| { i>=j }, a) }
 
-pub fn ns() -> HashMap<String, LispValue> {
+pub fn ns() -> HashMap<&'static str, LispValue> {
     let mut ns = HashMap::new();;
 
-    ns.insert("=".to_string(), native_function(equal_q));
+    ns.insert("=", native_function(equal_q));
 
-    ns.insert("+".to_string(), native_function(add));
-    ns.insert("-".to_string(), native_function(sub));
-    ns.insert("*".to_string(), native_function(mul));
-    ns.insert("/".to_string(), native_function(div));
-    ns.insert("<".to_string(),  native_function(lt));
-    ns.insert("<=".to_string(), native_function(lte));
-    ns.insert(">".to_string(),  native_function(gt));
-    ns.insert(">=".to_string(), native_function(gte));
+    ns.insert("+", native_function(add));
+    ns.insert("-", native_function(sub));
+    ns.insert("*", native_function(mul));
+    ns.insert("/", native_function(div));
+    ns.insert("<",  native_function(lt));
+    ns.insert("<=", native_function(lte));
+    ns.insert(">",  native_function(gt));
+    ns.insert(">=", native_function(gte));
 
-    ns.insert("list".to_string(), native_function(types::listv));
-    ns.insert("list?".to_string(), native_function(types::list_q));
-    ns.insert("vector".to_string(), native_function(types::vectorv));
-    ns.insert("vector?".to_string(), native_function(types::vector_q));
+    ns.insert("list", native_function(types::listv));
+    ns.insert("list?", native_function(types::list_q));
+    ns.insert("vector", native_function(types::vectorv));
+    ns.insert("vector?", native_function(types::vector_q));
 
     ns
 }
