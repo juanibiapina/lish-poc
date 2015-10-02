@@ -5,6 +5,7 @@ enum FormType {
     Def,
     Let,
     Do,
+    If,
     Function,
 }
 
@@ -14,6 +15,7 @@ impl FormType {
             "def!" => FormType::Def,
             "let" => FormType::Let,
             "do" => FormType::Do,
+            "if" => FormType::If,
             _ => FormType::Function,
         }
     }
@@ -42,6 +44,7 @@ fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
         FormType::Def => eval_def(elements, env),
         FormType::Let => eval_let(elements, env),
         FormType::Do => eval_do(elements, env),
+        FormType::If => eval_if(elements, env),
         FormType::Function => eval_function(ast.clone(), env),
     }
 }
@@ -107,6 +110,26 @@ fn eval_do(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
             return Ok(last.clone());
         }
         _ => panic!("invalid do call"),
+    }
+}
+
+
+fn eval_if(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+    let a1 = (*elements)[1].clone();
+    let c = try!(eval(a1, env.clone()));
+    match *c {
+        types::LispType::False | types::LispType::Nil => {
+            if elements.len() >= 4 {
+                let a3 = (*elements)[3].clone();
+                return eval(a3, env.clone());
+            } else {
+                return Ok(types::_nil());
+            }
+        },
+        _ => {
+            let a2 = (*elements)[2].clone();
+            return eval(a2, env.clone());
+        },
     }
 }
 
