@@ -7,54 +7,6 @@ use lisp::eval;
 use lisp::env::{Env, env_new, env_set};
 use lisp::core;
 
-fn process_lisp(input: String, env: Env) -> Result<(), Error> {
-    let mut reader = lisp::reader::Reader::new(input);
-
-    // read
-    let ast = try!(reader.read_form());
-
-    // eval
-    let result = try!(eval::eval(ast, env.clone()));
-
-    // print
-    println!("{}", result.print(true));
-
-    Ok(())
-}
-
-fn process_shell(input: String) -> Result<(), Error> {
-    let command_line = CommandLine::parse(input);
-
-    command_line.run()
-}
-
-fn process(input: String, env: Env) -> Result<(), Error> {
-    if input.starts_with("#") {
-        return Err(Error::Comment);
-    }
-
-    if input.starts_with("(") || input.starts_with("'") || input.starts_with("`") || input.starts_with("~") {
-        process_lisp(input, env)
-    } else {
-        process_shell(input)
-    }
-}
-
-fn rep(env: Env) -> Result<(), Error> {
-    let input = match readline::lish_readline(":) ") {
-        Some(input) => input,
-        None => return Err(Error::EndOfInput),
-    };
-
-    let trimmed_input = input.trim();
-
-    if trimmed_input.len() == 0 {
-        return Err(Error::EmptyCommand);
-    }
-
-    process(trimmed_input.to_string(), env)
-}
-
 pub fn run() {
     let repl_env = env_new(None);
     for (k, v) in core::ns().into_iter() {
@@ -94,4 +46,52 @@ pub fn run() {
             },
         };
     }
+}
+
+fn rep(env: Env) -> Result<(), Error> {
+    let input = match readline::lish_readline(":) ") {
+        Some(input) => input,
+        None => return Err(Error::EndOfInput),
+    };
+
+    let trimmed_input = input.trim();
+
+    if trimmed_input.len() == 0 {
+        return Err(Error::EmptyCommand);
+    }
+
+    process(trimmed_input.to_string(), env)
+}
+
+fn process(input: String, env: Env) -> Result<(), Error> {
+    if input.starts_with("#") {
+        return Err(Error::Comment);
+    }
+
+    if input.starts_with("(") || input.starts_with("'") || input.starts_with("`") || input.starts_with("~") {
+        process_lisp(input, env)
+    } else {
+        process_shell(input)
+    }
+}
+
+fn process_lisp(input: String, env: Env) -> Result<(), Error> {
+    let mut reader = lisp::reader::Reader::new(input);
+
+    // read
+    let ast = try!(reader.read_form());
+
+    // eval
+    let result = try!(eval::eval(ast, env.clone()));
+
+    // print
+    println!("{}", result.print(true));
+
+    Ok(())
+}
+
+fn process_shell(input: String) -> Result<(), Error> {
+    let command_line = CommandLine::parse(input);
+
+    command_line.run()
 }
