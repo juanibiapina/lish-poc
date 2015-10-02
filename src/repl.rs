@@ -54,9 +54,7 @@ fn rep(env: Env) -> Result<(), Error> {
         return Err(Error::EmptyCommand);
     }
 
-    try!(process(trimmed_input.to_string(), env));
-
-    Ok(())
+    process(trimmed_input.to_string(), env)
 }
 
 pub fn run() {
