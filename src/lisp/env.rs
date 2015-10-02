@@ -76,13 +76,6 @@ pub fn env_find(env: &Env, key: &LispValue) -> Option<Env> {
     }
 }
 
-pub fn env_root(env: &Env) -> Env {
-    match env.borrow().outer {
-        Some(ref ei) => env_root(ei),
-        None => env.clone(),
-    }
-}
-
 pub fn env_set(env: &Env, key: LispValue, val: LispValue) {
     match *key {
         Symbol(ref k) => { env.borrow_mut().data.insert(k.to_string(), val); }
