@@ -77,7 +77,7 @@ impl LispType {
                 format!("#<native-function ...>")
             },
             LispType::Function(_) => {
-                format!("(fn)")
+                format!("#<function ...>")
             },
         }
     }
