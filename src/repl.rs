@@ -25,9 +25,7 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
 fn process_shell(input: String) -> Result<(), Error> {
     let command_line = CommandLine::parse(input);
 
-    try!(command_line.run());
-
-    Ok(())
+    command_line.run()
 }
 
 fn process(input: String, env: Env) -> Result<(), Error> {
