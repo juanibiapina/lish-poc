@@ -5,23 +5,7 @@ use lisp;
 use lisp::types;
 use lisp::eval;
 use lisp::env::{Env, env_new, env_set};
-
-fn int_op<F>(f: F, a:Vec<types::LispValue>) -> types::LispResult
-    where F: FnOnce(isize, isize) -> isize
-{
-    match *a[0] {
-        types::LispType::Int(a0) => match *a[1] {
-            types::LispType::Int(a1) => Ok(types::_int(f(a0,a1))),
-            _ => Err(Error::TypeError("second arg must be an int".to_string())),
-        },
-        _ => Err(Error::TypeError("first arg must be an int".to_string())),
-    }
-}
-
-fn add(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i+j }, a) }
-fn sub(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i-j }, a) }
-fn mul(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i*j }, a) }
-fn div(a:Vec<types::LispValue>) -> types::LispResult { int_op(|i,j| { i/j }, a) }
+use lisp::core;
 
 fn process_lisp(input: String, env: Env) -> Result<(), Error> {
     let mut reader = lisp::reader::Reader::new(input);
@@ -78,10 +62,9 @@ fn rep(env: Env) -> Result<(), Error> {
 pub fn run() {
     // repl env
     let repl_env = env_new(None);
-    env_set(&repl_env, types::symbol("+"), types::function(add));
-    env_set(&repl_env, types::symbol("-"), types::function(sub));
-    env_set(&repl_env, types::symbol("*"), types::function(mul));
-    env_set(&repl_env, types::symbol("/"), types::function(div));
+    for (k, v) in core::ns().into_iter() {
+        env_set(&repl_env, types::symbol(&k), v);
+    }
 
     loop {
         match rep(repl_env.clone()) {
@@ -109,6 +92,9 @@ pub fn run() {
                 println!("trying to apply a non function");
             },
             Err(Error::TypeError(message)) => {
+                println!("{}", message);
+            },
+            Err(Error::Message(message)) => {
                 println!("{}", message);
             },
         };

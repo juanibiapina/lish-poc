@@ -7,4 +7,6 @@ pub enum Error {
     BindingNotFound(String),
     ApplyInNonFunction,
     TypeError(String),
+
+    Message(String),
 }

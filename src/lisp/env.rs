@@ -20,7 +20,7 @@ pub fn env_new(outer: Option<Env>) -> Env {
 
 pub fn env_bind(env: &Env,
                 mbinds: LispValue,
-                mexprs: LispValue) -> Result<Env,String> {
+                mexprs: LispValue) -> Result<Env, Error> {
     let mut variadic = false;
     match *mbinds {
         List(ref binds) | Vector(ref binds) => {
@@ -37,7 +37,7 @@ pub fn env_bind(env: &Env,
                                     env_set(env, b.clone(), exprs[i].clone());
                                 }
                             }
-                            _ => return Err("non-symbol bind".to_string()),
+                            _ => return Err(Error::Message("non-symbol bind".to_string())),
                         }
                     }
                     if variadic {
@@ -47,15 +47,15 @@ pub fn env_bind(env: &Env,
                                 let rest = exprs[i-1..].to_vec();
                                 env_set(env, sym.clone(), list(rest));
                             }
-                            _ => return Err("& bind to non-symbol".to_string()),
+                            _ => return Err(Error::Message("& bind to non-symbol".to_string())),
                         }
                     }
                     Ok(env.clone())
                 },
-                _ => Err("exprs must be a list".to_string()),
+                _ => Err(Error::Message("exprs must be a list".to_string())),
             }
         },
-        _ => Err("binds must be a list".to_string()),
+        _ => Err(Error::Message("binds must be a list".to_string())),
     }
 }
 
