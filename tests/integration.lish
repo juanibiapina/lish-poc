@@ -38,8 +38,4 @@ echo lol
 
 ;;; Testing reader errors
 (1 2
-; exfasdfpected ')', got EOF
-[1 2
-; expected ']', got EOF
-"abc
-; expected '"', got EOF
+;=>expected ')', got EOF
