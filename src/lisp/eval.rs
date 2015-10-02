@@ -11,7 +11,7 @@ impl FormType {
     pub fn from(name: &str) -> FormType {
         match name {
             "def!" => FormType::Def,
-            "let*" => FormType::Let,
+            "let" => FormType::Let,
             _ => FormType::Function,
         }
     }
