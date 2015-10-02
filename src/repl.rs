@@ -22,7 +22,7 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
     Ok(())
 }
 
-fn process_shell(input: String, env: Env) -> Result<(), Error> {
+fn process_shell(input: String) -> Result<(), Error> {
     let command_line = CommandLine::parse(input);
 
     try!(command_line.run());
@@ -38,7 +38,7 @@ fn process(input: String, env: Env) -> Result<(), Error> {
     if input.starts_with("(") || input.starts_with("'") || input.starts_with("`") || input.starts_with("~") {
         process_lisp(input, env)
     } else {
-        process_shell(input, env)
+        process_shell(input)
     }
 }
 
