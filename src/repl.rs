@@ -7,7 +7,6 @@ use shell::error::Error as ShellError;
 use lisp;
 use lisp::error::Error as LispError;
 use lisp::types;
-use lisp::eval;
 use lisp::env::{Env, env_new, env_set};
 use lisp::core;
 
@@ -94,7 +93,7 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
     let ast = try!(reader.read_form());
 
     // eval
-    let result = try!(eval::eval(ast, env.clone()));
+    let result = try!(lisp::eval::eval(ast, env.clone()));
 
     // print
     println!("{}", result.print(true));
@@ -105,9 +104,11 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
 fn process_shell(input: String) -> Result<(), Error> {
     let mut reader = shell::reader::Reader::new(input);
 
+    // read
     let command_line = try!(reader.read_command());
 
-    try!(command_line.run());
+    // eval
+    try!(shell::eval::eval(command_line));
 
     Ok(())
 }
