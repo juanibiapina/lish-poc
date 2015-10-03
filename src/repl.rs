@@ -1,7 +1,7 @@
 use readline;
 use error::Error;
 
-use shell::command_line::CommandLine;
+use shell;
 use shell::error::Error as ShellError;
 
 use lisp;
@@ -103,7 +103,9 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
 }
 
 fn process_shell(input: String) -> Result<(), Error> {
-    let command_line = CommandLine::parse(input);
+    let mut reader = shell::reader::Reader::new(input);
+
+    let command_line = reader.read_command();
 
     try!(command_line.run());
 
