@@ -105,7 +105,7 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
 fn process_shell(input: String) -> Result<(), Error> {
     let mut reader = shell::reader::Reader::new(input);
 
-    let command_line = reader.read_command();
+    let command_line = try!(reader.read_command());
 
     try!(command_line.run());
 

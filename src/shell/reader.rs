@@ -5,6 +5,7 @@ macro_rules! regex {
 }
 
 use shell::command_line::CommandLine;
+use shell::error::Error;
 
 pub struct Reader {
     tokens: Vec<String>,
@@ -17,7 +18,7 @@ impl Reader {
         }
     }
 
-    pub fn read_command(&mut self) -> CommandLine {
+    pub fn read_command(&mut self) -> Result<CommandLine, Error> {
         let mut iter = self.tokens.iter();
 
         let command = iter.next().unwrap().to_string();
@@ -26,10 +27,10 @@ impl Reader {
             args.push(part.to_string());
         }
 
-        CommandLine {
+        Ok(CommandLine {
             command: command,
             args: args,
-        }
+        })
     }
 }
 
