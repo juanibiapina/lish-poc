@@ -1,7 +1,11 @@
 use readline;
 use error::Error;
+
 use shell::command_line::CommandLine;
+use shell::error::Error as ShellError;
+
 use lisp;
+use lisp::error::Error as LispError;
 use lisp::types;
 use lisp::eval;
 use lisp::env::{Env, env_new, env_set};
@@ -26,23 +30,31 @@ pub fn run() {
             Err(Error::EmptyCommand) => {
                 continue;
             },
-            Err(Error::CommandNotFound(command)) => {
-                println!("lish: command not found: {}", command);
+            Err(Error::Lisp(err)) => {
+                match err {
+                    LispError::Parser(message) => {
+                        println!("{}", message);
+                    },
+                    LispError::BindingNotFound(name) => {
+                        println!("{} not found", name);
+                    },
+                    LispError::ApplyInNonFunction => {
+                        println!("trying to apply a non function");
+                    },
+                    LispError::TypeError(message) => {
+                        println!("{}", message);
+                    },
+                    LispError::Message(message) => {
+                        println!("{}", message);
+                    },
+                }
             },
-            Err(Error::Parser(message)) => {
-                println!("{}", message);
-            },
-            Err(Error::BindingNotFound(name)) => {
-                println!("{} not found", name);
-            },
-            Err(Error::ApplyInNonFunction) => {
-                println!("trying to apply a non function");
-            },
-            Err(Error::TypeError(message)) => {
-                println!("{}", message);
-            },
-            Err(Error::Message(message)) => {
-                println!("{}", message);
+            Err(Error::Shell(err)) => {
+                match err {
+                    ShellError::CommandNotFound(command) => {
+                        println!("lish: command not found: {}", command);
+                    },
+                }
             },
         };
     }
@@ -93,5 +105,7 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
 fn process_shell(input: String) -> Result<(), Error> {
     let command_line = CommandLine::parse(input);
 
-    command_line.run()
+    try!(command_line.run());
+
+    Ok(())
 }

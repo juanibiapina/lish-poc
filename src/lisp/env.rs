@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use lisp::types::{LispValue, LispResult, _nil, list};
 use lisp::types::LispType::{Symbol, List, Vector};
 
-use error::Error;
+use lisp::error::Error;
 
 struct EnvType {
     data: HashMap<String, LispValue>,

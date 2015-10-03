@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use error::Error;
+use shell::error::Error;
 
 pub struct CommandLine {
     command: String,

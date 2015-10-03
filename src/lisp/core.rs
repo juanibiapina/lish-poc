@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use lisp::types::{self, LispType, LispValue, LispResult, _true, _false, _int,
                   native_function};
-use error::Error;
+use lisp::error::Error;
 
 fn equal_q(a: Vec<LispValue>) -> LispResult {
     if a[0] == a[1] {Ok(_true())} else {Ok(_false())}
