@@ -27,7 +27,7 @@ pub fn run() {
                 println!("");
                 break;
             },
-            Err(Error::EmptyCommand) => {
+            Err(Error::EmptyInput) => {
                 continue;
             },
             Err(Error::Lisp(err)) => {
@@ -69,7 +69,7 @@ fn rep(env: Env) -> Result<(), Error> {
     let trimmed_input = input.trim();
 
     if trimmed_input.len() == 0 {
-        return Err(Error::EmptyCommand);
+        return Err(Error::EmptyInput);
     }
 
     process(trimmed_input.to_string(), env)

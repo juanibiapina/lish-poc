@@ -4,7 +4,7 @@ use shell::error::Error as ShellError;
 pub enum Error {
     Comment,
     EndOfInput,
-    EmptyCommand,
+    EmptyInput,
 
     Lisp(LispError),
     Shell(ShellError),
