@@ -82,7 +82,7 @@ fn process(input: String, env: Env) -> Result<(), Error> {
     if input.starts_with("(") || input.starts_with("'") || input.starts_with("`") || input.starts_with("~") {
         process_lisp(input, env)
     } else {
-        process_shell(input)
+        process_shell(input, env)
     }
 }
 
@@ -101,14 +101,14 @@ fn process_lisp(input: String, env: Env) -> Result<(), Error> {
     Ok(())
 }
 
-fn process_shell(input: String) -> Result<(), Error> {
+fn process_shell(input: String, env: Env) -> Result<(), Error> {
     let mut reader = shell::reader::Reader::new(input);
 
     // read
     let command_line = try!(reader.read_command());
 
     // eval
-    try!(shell::eval::eval(command_line));
+    try!(shell::eval::eval(command_line, env.clone()));
 
     Ok(())
 }

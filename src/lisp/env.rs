@@ -9,13 +9,32 @@ use lisp::error::Error;
 
 struct EnvType {
     data: HashMap<String, LispValue>,
+    aliases: HashMap<String, String>,
     outer: Option<Env>,
 }
 
 pub type Env = Rc<RefCell<EnvType>>;
 
 pub fn env_new(outer: Option<Env>) -> Env {
-    Rc::new(RefCell::new(EnvType{data: HashMap::new(), outer: outer}))
+    Rc::new(RefCell::new(EnvType{
+        data: HashMap::new(),
+        aliases: HashMap::new(),
+        outer: outer
+    }))
+}
+
+pub fn env_get_alias(env: &Env, key: &str) -> Option<String> {
+    let map = env.borrow();
+
+    if map.aliases.contains_key(key) {
+        Some(map.aliases.get(key).unwrap().to_string())
+    } else {
+        None
+    }
+}
+
+pub fn env_set_alias(env: &Env, name: &str, target: &str) {
+    env.borrow_mut().aliases.insert(name.to_string(), target.to_string());
 }
 
 pub fn env_bind(env: &Env,
