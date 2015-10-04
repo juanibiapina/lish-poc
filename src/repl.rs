@@ -16,7 +16,7 @@ pub struct Repl {
 impl Repl {
     pub fn new() -> Repl {
         Repl{
-            env: core::env(),
+            env: core::env::env(),
         }
     }
 

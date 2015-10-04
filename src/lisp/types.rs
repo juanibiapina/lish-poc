@@ -125,26 +125,8 @@ pub fn list(seq: Vec<LispValue>) -> LispValue {
     Rc::new(LispType::List(seq))
 }
 
-pub fn listv(seq:Vec<LispValue>) -> LispResult { Ok(list(seq)) }
-
-pub fn list_q(a:Vec<LispValue>) -> LispResult {
-    match *a[0].clone() {
-        List(_) => Ok(_true()),
-        _ => Ok(_false()),
-    }
-}
-
 pub fn vector(seq: Vec<LispValue>) -> LispValue {
     Rc::new(LispType::Vector(seq))
-}
-
-pub fn vectorv(seq: Vec<LispValue>) -> LispResult { Ok(vector(seq)) }
-
-pub fn vector_q(a:Vec<LispValue>) -> LispResult {
-    match *a[0].clone() {
-        Vector(_) => Ok(_true()),
-        _           => Ok(_false()),
-    }
 }
 
 pub fn _int(i: isize) -> LispValue {
