@@ -14,10 +14,7 @@ pub fn eval(command_line: CommandLine, env: Env) -> Result<(), Error> {
             args.push(string(arg.to_string()));
         };
 
-        let result = match value.apply(args) {
-            Ok(result) => result,
-            Err(_) => panic!("error"),
-        };
+        let result = try!(value.apply(args));
 
         println!("{}", result.print(false));
 
