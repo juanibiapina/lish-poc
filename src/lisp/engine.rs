@@ -17,6 +17,7 @@ impl Engine {
         };
 
         engine.run("(def! not (fn (a) (if a false true)))").unwrap();
+        engine.run("(def! load-file! (fn (f) (eval (read (str \"(do \" (slurp f) \")\")))))").unwrap();
 
         engine
     }

@@ -1,7 +1,8 @@
 use std::rc::Rc;
 
 use lisp::error::Error;
-use lisp::printer;
+use lisp::printer::pr_list;
+use lisp::printer::escape_str;
 use lisp::env::{Env, env_new, env_bind};
 
 use self::LispType::*;
@@ -62,7 +63,7 @@ impl LispType {
                 if v.starts_with("\u{29e}") {
                     format!(":{}", &v[2..])
                 } else if print_readably {
-                    printer::escape_str(v)
+                    escape_str(v)
                 } else {
                     v.clone()
                 }
@@ -102,22 +103,6 @@ impl PartialEq for LispType {
             _ => return false,
         }
     }
-}
-
-fn pr_list(lst: &Vec<LispValue>, pr: bool, start: &str , end: &str, join: &str) -> String {
-    let mut first = true;
-    let mut res = String::new();
-    res.push_str(start);
-    for mv in lst.iter() {
-        if first {
-            first = false;
-        } else {
-            res.push_str(join);
-        }
-        res.push_str(&mv.print(pr));
-    }
-    res.push_str(end);
-    res
 }
 
 // Constructors

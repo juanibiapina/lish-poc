@@ -4,6 +4,8 @@ macro_rules! regex {
     ($e:expr) => (regex::Regex::new($e).unwrap())
 }
 
+use lisp::types::LispValue;
+
 pub fn escape_str(s: &str) -> String {
     let mut escaped = String::new();
     escaped.push('"');
@@ -30,3 +32,20 @@ pub fn unescape_str(s: &str) -> String {
     let re2 = regex!(r#"\n"#);
     re2.replace_all(&re1.replace_all(&s, "\""), "\n")
 }
+
+pub fn pr_list(lst: &Vec<LispValue>, pr: bool, start: &str , end: &str, join: &str) -> String {
+    let mut first = true;
+    let mut res = String::new();
+    res.push_str(start);
+    for mv in lst.iter() {
+        if first {
+            first = false;
+        } else {
+            res.push_str(join);
+        }
+        res.push_str(&mv.print(pr));
+    }
+    res.push_str(end);
+    res
+}
+

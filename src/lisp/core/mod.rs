@@ -1,3 +1,4 @@
+mod string;
 mod list;
 mod vector;
 mod math;
