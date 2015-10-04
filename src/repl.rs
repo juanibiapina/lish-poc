@@ -1,3 +1,5 @@
+use std;
+
 use readline;
 use error::Error;
 
@@ -13,8 +15,20 @@ pub struct Repl {
 
 impl Repl {
     pub fn new() -> Repl {
+        let lisp_engine = LispEngine::new();
+
+        let mut home = std::env::home_dir().unwrap();
+
+        home.push(".init.lish");
+
+        let init_file = home.as_path().to_str().unwrap();
+
+        let load_init_command = format!("(load-file! \"{}\")", &init_file);
+
+        lisp_engine.run(&load_init_command);
+
         Repl{
-            lisp_engine: LispEngine::new(),
+            lisp_engine: lisp_engine,
         }
     }
 
