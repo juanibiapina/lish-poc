@@ -230,3 +230,9 @@
 ;=>nil
 concat obst gemuse
 ;=>obst und gemuse
+(def! inc (fn [x] (+ x 1)))
+;=>nil
+(export! inc)
+;=>nil
+inc 1
+;=>2
