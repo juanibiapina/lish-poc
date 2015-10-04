@@ -4,19 +4,17 @@ use error::Error;
 use shell;
 use shell::error::Error as ShellError;
 
-use lisp;
-use lisp::env::Env;
+use lisp::engine::Engine as LispEngine;
 use lisp::error::Error as LispError;
-use lisp::core;
 
 pub struct Repl {
-    env: Env,
+    lisp_engine: LispEngine,
 }
 
 impl Repl {
     pub fn new() -> Repl {
         Repl{
-            env: core::env::create(),
+            lisp_engine: LispEngine::new(),
         }
     }
 
@@ -92,16 +90,10 @@ impl Repl {
     }
 
     fn process_lisp(&self, input: String) -> Result<(), Error> {
-        let mut reader = lisp::reader::Reader::new(input);
-
-        // read
-        let ast = try!(reader.read_form());
-
-        // eval
-        let result = try!(lisp::eval::eval(ast, self.env.clone()));
+        let result = try!(self.lisp_engine.run(input));
 
         // print
-        println!("{}", result.print(true));
+        println!("{}", result);
 
         Ok(())
     }
@@ -113,7 +105,7 @@ impl Repl {
         let command_line = try!(reader.read_command());
 
         // eval
-        try!(shell::eval::eval(command_line, self.env.clone()));
+        try!(shell::eval::eval(command_line, self.lisp_engine.env.clone()));
 
         Ok(())
     }
