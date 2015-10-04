@@ -1,5 +1,5 @@
 use lisp::types::{LispValue, LispType, LispResult, list, vector, _nil, function};
-use lisp::env::{Env, env_new, env_get, env_set, env_set_alias};
+use lisp::env::{Env, env_new, env_get, env_set, env_set_alias, env_root};
 
 enum FormType {
     Def,
@@ -7,6 +7,7 @@ enum FormType {
     Do,
     If,
     Fn,
+    Eval,
     Alias,
     Function,
 }
@@ -19,6 +20,7 @@ impl FormType {
             "do" => FormType::Do,
             "if" => FormType::If,
             "fn" => FormType::Fn,
+            "eval" => FormType::Eval,
             "alias!" => FormType::Alias,
             _ => FormType::Function,
         }
@@ -50,6 +52,7 @@ fn eval_list(ast: LispValue, env: Env) -> LispResult {
         FormType::Do => eval_do(elements, env),
         FormType::If => eval_if(elements, env),
         FormType::Fn => eval_fn(elements, env),
+        FormType::Eval => eval_eval(elements, env),
         FormType::Alias => eval_alias(elements, env),
         FormType::Function => eval_function(ast.clone(), env),
     }
@@ -144,6 +147,14 @@ fn eval_fn(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let a2 = elements[2].clone();
     return Ok(function(eval, a2, env, a1));
 }
+
+fn eval_eval(elements: &Vec<LispValue>, env: Env) -> LispResult {
+    let a1 = (*elements)[1].clone();
+    let ast = try!(eval(a1, env.clone()));
+    let env = env_root(&env);
+    return eval(ast, env);
+}
+
 
 fn eval_alias(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let name = (*elements)[1].clone();

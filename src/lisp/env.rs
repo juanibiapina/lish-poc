@@ -37,6 +37,13 @@ pub fn env_set_alias(env: &Env, name: &str, target: &str) {
     env.borrow_mut().aliases.insert(name.to_string(), target.to_string());
 }
 
+pub fn env_root(env: &Env) -> Env {
+    match env.borrow().outer {
+        Some(ref ei) => env_root(ei),
+        None => env.clone(),
+    }
+}
+
 pub fn env_bind(env: &Env,
                 mbinds: LispValue,
                 mexprs: LispValue) -> Result<Env, Error> {
