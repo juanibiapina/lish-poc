@@ -1,3 +1,4 @@
+use lisp::error::Error;
 use lisp::types::{LispValue, LispType, LispResult, list, vector, _nil, function};
 use lisp::env::{Env, env_new, env_get, env_set, env_set_alias, env_root};
 
@@ -112,6 +113,10 @@ fn eval_let(elements: &Vec<LispValue>, env: Env) -> LispResult {
 }
 
 fn eval_do(elements: &Vec<LispValue>, env: Env) -> LispResult {
+    if elements.len() < 2 {
+        return Err(Error::SyntaxError("do: syntax error".to_string()));
+    }
+
     let el = list(elements[1..].to_vec());
     match *try!(eval_ast(el, env.clone())) {
         LispType::List(ref lst) => {

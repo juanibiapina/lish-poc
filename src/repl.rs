@@ -49,6 +49,9 @@ impl Repl {
                         LispError::Message(message) => {
                             println!("{}", message);
                         },
+                        LispError::SyntaxError(message) => {
+                            println!("{}", message);
+                        },
                     }
                 },
                 Err(Error::Shell(err)) => {
