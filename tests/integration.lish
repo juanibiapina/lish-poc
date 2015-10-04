@@ -223,8 +223,10 @@
 ( (fn [f x] (f x)) (fn [a] (+ 1 a)) 7)
 ;=>8
 
-;; Aliases
-(defalias! e echo)
+;; Export
+(def! concat (fn [a b] (str a " und " b)))
 ;=>nil
-e lol
-;=>lol
+(export! concat)
+;=>nil
+concat obst gemuse
+;=>obst und gemuse

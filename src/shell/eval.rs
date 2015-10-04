@@ -19,7 +19,7 @@ pub fn eval(command_line: CommandLine, env: Env) -> Result<(), Error> {
             Err(_) => panic!("error"),
         };
 
-        println!("{}", result.print(true));
+        println!("{}", result.print(false));
 
         Ok(())
     } else {
