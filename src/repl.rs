@@ -1,7 +1,6 @@
-use std;
-
 use readline;
 use error::Error;
+use config::Config;
 
 use shell;
 use shell::error::Error as ShellError;
@@ -14,16 +13,10 @@ pub struct Repl {
 }
 
 impl Repl {
-    pub fn new() -> Repl {
+    pub fn new(config: Config) -> Repl {
         let lisp_engine = LispEngine::new();
 
-        let mut home = std::env::home_dir().unwrap();
-
-        home.push(".init.lish");
-
-        let init_file = home.as_path().to_str().unwrap();
-
-        let load_init_command = format!("(load-file! \"{}\")", &init_file);
+        let load_init_command = format!("(load-file! \"{}\")", &config.init_file);
 
         lisp_engine.run(&load_init_command);
 
