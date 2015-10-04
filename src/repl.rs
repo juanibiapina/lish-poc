@@ -106,7 +106,6 @@ impl Repl {
     fn process_lisp(&self, input: String) -> Result<(), Error> {
         let result = try!(self.lisp_engine.run(&input));
 
-        // print
         println!("{}", result);
 
         Ok(())
