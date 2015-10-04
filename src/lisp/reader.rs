@@ -14,7 +14,7 @@ pub struct Reader {
 }
 
 impl Reader {
-    pub fn new(str: String) -> Reader {
+    pub fn new(str: &str) -> Reader {
         Reader{
             tokens: tokenize(str),
             position: 0
@@ -148,7 +148,13 @@ impl Reader {
     }
 }
 
-fn tokenize(str: String) -> Vec<String> {
+pub fn read(str: &str) -> types::LispResult {
+    let mut reader = Reader::new(str);
+
+    reader.read_form()
+}
+
+fn tokenize(str: &str) -> Vec<String> {
     let mut results = vec![];
     let re = regex!(r###"[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"`,;)]*)"###);
     for cap in re.captures_iter(&str) {

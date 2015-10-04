@@ -1,4 +1,4 @@
-use lisp::reader::Reader;
+use lisp::reader;
 use lisp::env::Env;
 use lisp::error::Error;
 use lisp::eval::eval;
@@ -22,10 +22,8 @@ impl Engine {
     }
 
     pub fn run(&self, input: &str) -> Result<String, Error> {
-        let mut reader = Reader::new(input.to_string());
-
         // read
-        let ast = try!(reader.read_form());
+        let ast = try!(reader::read(input));
 
         // eval
         let result = try!(eval(ast, self.env.clone()));
