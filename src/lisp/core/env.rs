@@ -8,6 +8,7 @@ use lisp::core::list;
 use lisp::core::vector;
 use lisp::core::math;
 use lisp::core::reader;
+use lisp::core::file;
 
 fn ns() -> HashMap<&'static str, LispValue> {
     let mut ns = HashMap::new();;
@@ -29,6 +30,7 @@ fn ns() -> HashMap<&'static str, LispValue> {
     ns.insert("vector?", native_function(vector::vector_q));
 
     ns.insert("read", native_function(reader::read));
+    ns.insert("slurp", native_function(file::slurp));
 
     ns
 }
