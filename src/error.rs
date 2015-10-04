@@ -1,6 +1,7 @@
 use lisp::error::Error as LispError;
 use shell::error::Error as ShellError;
 
+#[derive(Debug)]
 pub enum Error {
     Comment,
     EndOfInput,

@@ -10,13 +10,19 @@ pub struct Engine {
 
 impl Engine {
     pub fn new() -> Engine {
-        Engine{
-            env: core::env::create(),
-        }
+        let core_env = core::env::create();
+
+        let engine = Engine{
+            env: core_env,
+        };
+
+        engine.run("(def! not (fn (a) (if a false true)))").unwrap();
+
+        engine
     }
 
-    pub fn run(&self, input: String) -> Result<String, Error> {
-        let mut reader = Reader::new(input);
+    pub fn run(&self, input: &str) -> Result<String, Error> {
+        let mut reader = Reader::new(input.to_string());
 
         // read
         let ast = try!(reader.read_form());
