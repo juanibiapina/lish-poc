@@ -3,25 +3,35 @@ use std::process::Command;
 use shell::command_line::CommandLine;
 use shell::error::Error;
 
-use lisp::env::{Env, env_get_alias};
+use lisp::types::string;
+use lisp::env::{Env, env_get_export};
 
 pub fn eval(command_line: CommandLine, env: Env) -> Result<(), Error> {
-    let resolved;
+    if let Some(value) = env_get_export(&env.clone(), &command_line.command) {
+        let mut args = vec!();
 
-    if let Some(name) = env_get_alias(&env, &command_line.command) {
-        resolved = command_line.replace_alias(name);
-    } else {
-        resolved = command_line;
-    }
-
-    let mut child = match Command::new(&resolved.command)
-        .args(&resolved.args)
-        .spawn() {
-            Ok(child) => child,
-            Err(_) => return Err(Error::CommandNotFound(resolved.command.to_string())),
+        for arg in command_line.args.iter() {
+            args.push(string(arg.to_string()));
         };
 
-    child.wait().unwrap();
+        let result = match value.apply(args) {
+            Ok(result) => result,
+            Err(_) => panic!("error"),
+        };
 
-    Ok(())
+        println!("{}", result.print(true));
+
+        Ok(())
+    } else {
+        let mut child = match Command::new(&command_line.command)
+            .args(&command_line.args)
+            .spawn() {
+                Ok(child) => child,
+                Err(_) => return Err(Error::CommandNotFound(command_line.command.to_string())),
+            };
+
+        child.wait().unwrap();
+
+        Ok(())
+    }
 }

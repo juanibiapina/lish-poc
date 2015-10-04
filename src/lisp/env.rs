@@ -2,14 +2,14 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use lisp::types::{LispValue, LispResult, _nil, list};
+use lisp::types::{LispValue, LispResult, _nil, list, symbol};
 use lisp::types::LispType::{Symbol, List, Vector};
 
 use lisp::error::Error;
 
 struct EnvType {
     data: HashMap<String, LispValue>,
-    aliases: HashMap<String, String>,
+    exports: HashMap<String, LispValue>,
     outer: Option<Env>,
 }
 
@@ -18,23 +18,24 @@ pub type Env = Rc<RefCell<EnvType>>;
 pub fn env_new(outer: Option<Env>) -> Env {
     Rc::new(RefCell::new(EnvType{
         data: HashMap::new(),
-        aliases: HashMap::new(),
+        exports: HashMap::new(),
         outer: outer
     }))
 }
 
-pub fn env_get_alias(env: &Env, key: &str) -> Option<String> {
-    let map = env.borrow();
+pub fn env_export(env: &Env, name: &str) -> LispResult {
+    let value = try!(env_get(env, &symbol(name)));
 
-    if map.aliases.contains_key(key) {
-        Some(map.aliases.get(key).unwrap().to_string())
-    } else {
-        None
-    }
+    env.borrow_mut().exports.insert(name.to_string(), value);
+
+    Ok(_nil())
 }
 
-pub fn env_set_alias(env: &Env, name: &str, target: &str) {
-    env.borrow_mut().aliases.insert(name.to_string(), target.to_string());
+pub fn env_get_export(env: &Env, name: &str) -> Option<LispValue> {
+    match env.borrow().exports.get(name) {
+        Some(value) => Some(value.clone()),
+        None => None,
+    }
 }
 
 pub fn env_root(env: &Env) -> Env {

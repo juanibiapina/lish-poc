@@ -1,5 +1,5 @@
 use lisp::types::{LispValue, LispType, LispResult, list, vector, _nil, function};
-use lisp::env::{Env, env_new, env_get, env_set, env_set_alias, env_root};
+use lisp::env::{Env, env_new, env_get, env_set, env_export, env_root};
 
 enum FormType {
     Def,
@@ -8,7 +8,7 @@ enum FormType {
     If,
     Fn,
     Eval,
-    DefAlias,
+    Export,
     Function,
 }
 
@@ -21,7 +21,7 @@ impl FormType {
             "if" => FormType::If,
             "fn" => FormType::Fn,
             "eval" => FormType::Eval,
-            "defalias!" => FormType::DefAlias,
+            "export!" => FormType::Export,
             _ => FormType::Function,
         }
     }
@@ -53,7 +53,7 @@ fn eval_list(ast: LispValue, env: Env) -> LispResult {
         FormType::If => eval_if(elements, env),
         FormType::Fn => eval_fn(elements, env),
         FormType::Eval => eval_eval(elements, env),
-        FormType::DefAlias => eval_alias(elements, env),
+        FormType::Export => eval_export(elements, env),
         FormType::Function => eval_function(ast.clone(), env),
     }
 }
@@ -160,20 +160,13 @@ fn eval_eval(elements: &Vec<LispValue>, env: Env) -> LispResult {
 }
 
 
-fn eval_alias(elements: &Vec<LispValue>, env: Env) -> LispResult {
+fn eval_export(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let name = (*elements)[1].clone();
-    let target = (*elements)[2].clone();
     match *name {
-        LispType::Symbol(ref name_value) => {
-            match *target {
-                LispType::Symbol(ref target_value) => {
-                    env_set_alias(&env.clone(), name_value, target_value);
-                    return Ok(_nil());
-                },
-                _ => panic!("defalias!: syntax error"),
-            }
+        LispType::Symbol(ref name) => {
+            return env_export(&env.clone(), name);
         },
-        _ => panic!("defalias!: syntax error"),
+        _ => panic!("export!: syntax error"),
     }
 }
 
