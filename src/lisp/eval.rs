@@ -8,7 +8,7 @@ enum FormType {
     If,
     Fn,
     Eval,
-    Alias,
+    DefAlias,
     Function,
 }
 
@@ -21,7 +21,7 @@ impl FormType {
             "if" => FormType::If,
             "fn" => FormType::Fn,
             "eval" => FormType::Eval,
-            "alias!" => FormType::Alias,
+            "defalias!" => FormType::DefAlias,
             _ => FormType::Function,
         }
     }
@@ -53,7 +53,7 @@ fn eval_list(ast: LispValue, env: Env) -> LispResult {
         FormType::If => eval_if(elements, env),
         FormType::Fn => eval_fn(elements, env),
         FormType::Eval => eval_eval(elements, env),
-        FormType::Alias => eval_alias(elements, env),
+        FormType::DefAlias => eval_alias(elements, env),
         FormType::Function => eval_function(ast.clone(), env),
     }
 }
@@ -170,10 +170,10 @@ fn eval_alias(elements: &Vec<LispValue>, env: Env) -> LispResult {
                     env_set_alias(&env.clone(), name_value, target_value);
                     return Ok(_nil());
                 },
-                _ => panic!("alias!: syntax error"),
+                _ => panic!("defalias!: syntax error"),
             }
         },
-        _ => panic!("alias!: syntax error"),
+        _ => panic!("defalias!: syntax error"),
     }
 }
 

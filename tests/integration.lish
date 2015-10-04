@@ -224,7 +224,7 @@
 ;=>8
 
 ;; Aliases
-(alias! e echo)
+(defalias! e echo)
 ;=>nil
 e lol
 ;=>lol
