@@ -3,7 +3,7 @@ use std::process::Command;
 use shell::command_line::CommandLine;
 use error::Error;
 
-use lisp::types::string;
+use lisp::reader::read;
 use lisp::env::{Env, env_get_export};
 
 pub fn eval(command_line: CommandLine, env: Env) -> Result<(), Error> {
@@ -11,7 +11,7 @@ pub fn eval(command_line: CommandLine, env: Env) -> Result<(), Error> {
         let mut args = vec!();
 
         for arg in command_line.args.iter() {
-            args.push(string(arg.to_string()));
+            args.push(try!(read(arg)));
         };
 
         let result = try!(value.apply(args));
