@@ -1,4 +1,4 @@
-use lisp::types;
+use lisp::types::{LispValue, LispType, LispResult, list, vector, _nil, function};
 use lisp::env::{Env, env_new, env_get, env_set, env_set_alias};
 
 enum FormType {
@@ -25,19 +25,19 @@ impl FormType {
     }
 }
 
-pub fn eval(ast: types::LispValue, env: Env) -> types::LispResult {
+pub fn eval(ast: LispValue, env: Env) -> LispResult {
     match *ast {
-        types::LispType::List(_) => return eval_list(ast, env),
+        LispType::List(_) => return eval_list(ast, env),
         _ => return eval_ast(ast, env),
     };
 }
 
-fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
+fn eval_list(ast: LispValue, env: Env) -> LispResult {
     let (form_type, elements) = match *ast {
-        types::LispType::List(ref elements) => {
+        LispType::List(ref elements) => {
             let ref head = *elements[0];
             match *head {
-                types::LispType::Symbol(ref name) => (FormType::from(name), elements),
+                LispType::Symbol(ref name) => (FormType::from(name), elements),
                 _ => (FormType::Function, elements),
             }
         },
@@ -55,47 +55,47 @@ fn eval_list(ast: types::LispValue, env: Env) -> types::LispResult {
     }
 }
 
-fn eval_ast(ast: types::LispValue, env: Env) -> types::LispResult {
+fn eval_ast(ast: LispValue, env: Env) -> LispResult {
     match *ast {
-        types::LispType::Symbol(_) => env_get(&env, &ast),
-        types::LispType::List(ref a) | types::LispType::Vector(ref a) => {
-            let mut ast_vec : Vec<types::LispValue> = vec![];
+        LispType::Symbol(_) => env_get(&env, &ast),
+        LispType::List(ref a) | LispType::Vector(ref a) => {
+            let mut ast_vec : Vec<LispValue> = vec![];
             for mv in a.iter() {
                 let mv2 = mv.clone();
                 ast_vec.push(try!(eval(mv2, env.clone())));
             }
-            Ok(match *ast { types::LispType::List(_) => types::list(ast_vec),
-            _                          => types::vector(ast_vec) })
+            Ok(match *ast { LispType::List(_) => list(ast_vec),
+            _                          => vector(ast_vec) })
         },
         _ => Ok(ast.clone()),
     }
 }
 
-fn eval_def(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+fn eval_def(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let a1 = (*elements)[1].clone();
     let a2 = (*elements)[2].clone();
     let r = try!(eval(a2, env.clone()));
     match *a1 {
-        types::LispType::Symbol(_) => {
+        LispType::Symbol(_) => {
             env_set(&env.clone(), a1, r.clone());
-            return Ok(types::_nil());
+            return Ok(_nil());
         },
         _ => panic!("def! of non-symbol"),
     }
 }
 
-fn eval_let(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+fn eval_let(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let let_env = env_new(Some(env.clone()));
     let a1 = (*elements)[1].clone();
     let a2 = (*elements)[2].clone();
     match *a1 {
-        types::LispType::List(ref binds) | types::LispType::Vector(ref binds) => {
+        LispType::List(ref binds) | LispType::Vector(ref binds) => {
             let mut it = binds.iter();
             while it.len() >= 2 {
                 let b = it.next().unwrap();
                 let exp = it.next().unwrap();
                 match **b {
-                    types::LispType::Symbol(_) => {
+                    LispType::Symbol(_) => {
                         let r = try!(eval(exp.clone(), let_env.clone()));
                         env_set(&let_env, b.clone(), r);
                     },
@@ -108,10 +108,10 @@ fn eval_let(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
     return eval(a2, let_env.clone());
 }
 
-fn eval_do(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
-    let el = types::list(elements[1..].to_vec());
+fn eval_do(elements: &Vec<LispValue>, env: Env) -> LispResult {
+    let el = list(elements[1..].to_vec());
     match *try!(eval_ast(el, env.clone())) {
-        types::LispType::List(ref lst) => {
+        LispType::List(ref lst) => {
             let ref last = lst[lst.len()-1];
             return Ok(last.clone());
         }
@@ -120,16 +120,16 @@ fn eval_do(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
 }
 
 
-fn eval_if(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+fn eval_if(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let a1 = (*elements)[1].clone();
     let c = try!(eval(a1, env.clone()));
     match *c {
-        types::LispType::False | types::LispType::Nil => {
+        LispType::False | LispType::Nil => {
             if elements.len() >= 4 {
                 let a3 = (*elements)[3].clone();
                 return eval(a3, env.clone());
             } else {
-                return Ok(types::_nil());
+                return Ok(_nil());
             }
         },
         _ => {
@@ -139,21 +139,21 @@ fn eval_if(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
     }
 }
 
-fn eval_fn(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+fn eval_fn(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let a1 = elements[1].clone();
     let a2 = elements[2].clone();
-    return Ok(types::function(eval, a2, env, a1));
+    return Ok(function(eval, a2, env, a1));
 }
 
-fn eval_alias(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
+fn eval_alias(elements: &Vec<LispValue>, env: Env) -> LispResult {
     let name = (*elements)[1].clone();
     let target = (*elements)[2].clone();
     match *name {
-        types::LispType::Symbol(ref name_value) => {
+        LispType::Symbol(ref name_value) => {
             match *target {
-                types::LispType::Symbol(ref target_value) => {
+                LispType::Symbol(ref target_value) => {
                     env_set_alias(&env.clone(), name_value, target_value);
-                    return Ok(types::_nil());
+                    return Ok(_nil());
                 },
                 _ => panic!("alias!: syntax error"),
             }
@@ -162,10 +162,10 @@ fn eval_alias(elements: &Vec<types::LispValue>, env: Env) -> types::LispResult {
     }
 }
 
-fn eval_function(ast: types::LispValue, env: Env) -> types::LispResult {
+fn eval_function(ast: LispValue, env: Env) -> LispResult {
     let el = try!(eval_ast(ast.clone(), env.clone()));
     let args = match *el {
-        types::LispType::List(ref args) => args,
+        LispType::List(ref args) => args,
         _ => panic!("unreachable code"),
     };
     let ref f = args.clone()[0];
