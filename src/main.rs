@@ -1,9 +1,11 @@
 extern crate lish;
 
 #[cfg(not(test))]
-use lish::repl;
+use lish::repl::Repl;
 
 #[cfg(not(test))]
 fn main() {
-    repl::run();
+    let repl = Repl::new();
+
+    repl.run();
 }

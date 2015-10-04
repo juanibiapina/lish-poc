@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use lisp::types::{self, LispType, LispValue, LispResult, _true, _false, _int,
                   native_function};
 use lisp::error::Error;
+use lisp::env::{Env, env_new, env_set};
 
 fn equal_q(a: Vec<LispValue>) -> LispResult {
     if a[0] == a[1] {Ok(_true())} else {Ok(_false())}
@@ -47,7 +48,7 @@ pub fn lte(a: Vec<LispValue>) -> LispResult { bool_op(|i,j| { i<=j }, a) }
 pub fn gt (a: Vec<LispValue>) -> LispResult { bool_op(|i,j| { i>j }, a) }
 pub fn gte(a: Vec<LispValue>) -> LispResult { bool_op(|i,j| { i>=j }, a) }
 
-pub fn ns() -> HashMap<&'static str, LispValue> {
+fn ns() -> HashMap<&'static str, LispValue> {
     let mut ns = HashMap::new();;
 
     ns.insert("=", native_function(equal_q));
@@ -67,4 +68,14 @@ pub fn ns() -> HashMap<&'static str, LispValue> {
     ns.insert("vector?", native_function(types::vector_q));
 
     ns
+}
+
+pub fn env() -> Env {
+    let env = env_new(None);
+
+    for (k, v) in ns().into_iter() {
+        env_set(&env, types::symbol(k), v);
+    }
+
+    env
 }
