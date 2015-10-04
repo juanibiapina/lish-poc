@@ -4,7 +4,7 @@ macro_rules! regex {
     ($e:expr) => (regex::Regex::new($e).unwrap())
 }
 
-use lisp::error::Error;
+use error::Error;
 use lisp::types;
 use lisp::printer;
 

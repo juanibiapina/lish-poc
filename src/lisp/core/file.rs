@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Read;
 
-use lisp::error::Error;
+use error::Error;
 use lisp::types::{LispValue, LispResult, LispType, string};
 
 pub fn slurp(a: Vec<LispValue>) -> LispResult {

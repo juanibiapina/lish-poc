@@ -1,24 +1,16 @@
-use lisp::error::Error as LispError;
-use shell::error::Error as ShellError;
-
 #[derive(Debug)]
 pub enum Error {
     Comment,
     EndOfInput,
     EmptyInput,
 
-    Lisp(LispError),
-    Shell(ShellError),
-}
+    // lisp errors
+    Parser(String),
+    BindingNotFound(String),
+    ApplyInNonFunction,
+    TypeError(String),
+    Message(String),
 
-impl From<LispError> for Error {
-    fn from(err: LispError) -> Error {
-        Error::Lisp(err)
-    }
-}
-
-impl From<ShellError> for Error {
-    fn from(err: ShellError) -> Error {
-        Error::Shell(err)
-    }
+    // shell errors
+    CommandNotFound(String),
 }

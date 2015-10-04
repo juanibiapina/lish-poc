@@ -1,7 +1,7 @@
 use std::process::Command;
 
 use shell::command_line::CommandLine;
-use shell::error::Error;
+use error::Error;
 
 use lisp::types::string;
 use lisp::env::{Env, env_get_export};

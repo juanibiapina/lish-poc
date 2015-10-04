@@ -1,4 +1,4 @@
-use lisp::error::Error;
+use error::Error;
 use lisp::reader;
 use lisp::types::{LispValue, LispResult, LispType};
 

@@ -3,10 +3,7 @@ use error::Error;
 use config::Config;
 
 use shell;
-use shell::error::Error as ShellError;
-
 use lisp::engine::Engine as LispEngine;
-use lisp::error::Error as LispError;
 
 pub struct Repl {
     lisp_engine: LispEngine,
@@ -39,31 +36,23 @@ impl Repl {
                 Err(Error::EmptyInput) => {
                     continue;
                 },
-                Err(Error::Lisp(err)) => {
-                    match err {
-                        LispError::Parser(message) => {
-                            println!("{}", message);
-                        },
-                        LispError::BindingNotFound(name) => {
-                            println!("{} not found", name);
-                        },
-                        LispError::ApplyInNonFunction => {
-                            println!("trying to apply a non function");
-                        },
-                        LispError::TypeError(message) => {
-                            println!("{}", message);
-                        },
-                        LispError::Message(message) => {
-                            println!("{}", message);
-                        },
-                    }
+                Err(Error::Parser(message)) => {
+                    println!("{}", message);
                 },
-                Err(Error::Shell(err)) => {
-                    match err {
-                        ShellError::CommandNotFound(command) => {
-                            println!("lish: command not found: {}", command);
-                        },
-                    }
+                Err(Error::BindingNotFound(name)) => {
+                    println!("{} not found", name);
+                },
+                Err(Error::ApplyInNonFunction) => {
+                    println!("trying to apply a non function");
+                },
+                Err(Error::TypeError(message)) => {
+                    println!("{}", message);
+                },
+                Err(Error::Message(message)) => {
+                    println!("{}", message);
+                },
+                Err(Error::CommandNotFound(command)) => {
+                    println!("lish: command not found: {}", command);
                 },
             };
         }

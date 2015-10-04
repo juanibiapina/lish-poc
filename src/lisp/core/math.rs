@@ -1,4 +1,4 @@
-use lisp::error::Error;
+use error::Error;
 use lisp::types::{LispType, LispValue, LispResult, _true, _false, _int};
 
 fn int_op<F>(f: F, a:Vec<LispValue>) -> LispResult

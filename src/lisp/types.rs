@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use lisp::error::Error;
+use error::Error;
 use lisp::printer::pr_list;
 use lisp::printer::escape_str;
 use lisp::env::{Env, env_new, env_bind};

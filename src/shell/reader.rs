@@ -5,7 +5,7 @@ macro_rules! regex {
 }
 
 use shell::command_line::CommandLine;
-use shell::error::Error;
+use error::Error;
 
 pub struct Reader {
     tokens: Vec<String>,

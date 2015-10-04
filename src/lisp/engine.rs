@@ -1,6 +1,6 @@
 use lisp::reader;
 use lisp::env::Env;
-use lisp::error::Error;
+use error::Error;
 use lisp::eval::eval;
 use lisp::core;
 
